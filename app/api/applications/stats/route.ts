@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
         // Summary report (default)
         const summaryStats = await GET(request)
         const summaryData = await summaryStats.json()
-        reportData = { ...reportData, ...summaryData.stats }
+        Object.assign(reportData, summaryData.stats)
     }
 
     // If format is CSV or PDF, prepare download response
