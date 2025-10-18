@@ -128,7 +128,7 @@ export async function PUT(
     }
 
     // Update appointment
-    const updateData: any = {
+    const updateData: Record<string, any> = {
       updated_at: new Date().toISOString()
     }
 

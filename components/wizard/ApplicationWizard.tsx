@@ -38,8 +38,8 @@ interface WizardStep {
   id: string
   title: string
   description: string
-  icon: any
-  component: any
+  icon: React.ComponentType<any>
+  component: React.ComponentType<any>
   required: boolean
 }
 
@@ -109,7 +109,7 @@ interface ApplicationWizardProps {
 
 export default function ApplicationWizard({ applicationId, onComplete }: ApplicationWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [formData, setFormData] = useState<any>({})
+  const [formData, setFormData] = useState<Record<string, any>>({})
   const [stepValidation, setStepValidation] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true)
@@ -158,8 +158,8 @@ export default function ApplicationWizard({ applicationId, onComplete }: Applica
     }
   }
 
-  const handleStepComplete = (stepId: string, data: any, isValid: boolean) => {
-    setFormData((prev: any) => ({ ...prev, [stepId]: data }))
+  const handleStepComplete = (stepId: string, data: Record<string, any>, isValid: boolean) => {
+    setFormData((prev) => ({ ...prev, [stepId]: data }))
     setStepValidation((prev) => ({ ...prev, [stepId]: isValid }))
   }
 

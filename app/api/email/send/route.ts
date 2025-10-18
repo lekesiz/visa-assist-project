@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
       emailLogId: emailLog?.id
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Email send error:', error)
     
     // Log failed email attempt
