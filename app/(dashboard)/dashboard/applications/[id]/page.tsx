@@ -33,8 +33,8 @@ interface PageProps {
 export default function ApplicationDetailPage({ params }: PageProps) {
   const router = useRouter()
   const supabase = createClient()
-  const [application, setApplication] = useState<any>(null)
-  const [documents, setDocuments] = useState<any[]>([])
+  const [application, setApplication] = useState<Record<string, any> | null>(null)
+  const [documents, setDocuments] = useState<Record<string, any>[]>([])
   const [loading, setLoading] = useState(true)
   const [uploadingDocument, setUploadingDocument] = useState(false)
   const [showUploader, setShowUploader] = useState(false)

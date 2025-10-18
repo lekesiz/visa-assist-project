@@ -86,7 +86,7 @@ function ResetPasswordContent() {
       }
 
       setEmail('')
-    } catch (error: any) {
+    } catch (error) {
       // Don't reveal if email exists or not for security
       setMessage('If an account exists with this email, you will receive password reset instructions.')
     } finally {
@@ -119,8 +119,9 @@ function ResetPasswordContent() {
 
         setMode('success')
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to reset password')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to reset password'
+      setError(message)
     } finally {
       setLoading(false)
     }
