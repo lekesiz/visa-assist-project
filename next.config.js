@@ -44,7 +44,8 @@ const nextConfig = {
   },
 
   // Output configuration for Vercel
-  output: 'standalone',
+  // Removed standalone mode - Vercel handles static file serving better without it
+  // output: 'standalone',
 
   // Headers for security
   async headers() {
