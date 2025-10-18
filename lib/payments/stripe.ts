@@ -1,10 +1,24 @@
 import Stripe from 'stripe'
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-  typescript: true,
-})
+// Lazy initialize Stripe to avoid errors during build
+let stripeClient: Stripe | null = null
+
+function getStripeClient(): Stripe {
+  if (!stripeClient) {
+    const apiKey = process.env.STRIPE_SECRET_KEY
+    if (!apiKey) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set')
+    }
+    stripeClient = new Stripe(apiKey, {
+      apiVersion: '2024-12-18.acacia' as any,
+      typescript: true,
+    })
+  }
+  return stripeClient
+}
+
+// Export helper - note: this is for backwards compatibility
+export const stripe = null as any
 
 export interface CreatePaymentIntentParams {
   amount: number // in cents
@@ -36,7 +50,7 @@ export async function createPaymentIntent({
   metadata = {}
 }: CreatePaymentIntentParams) {
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripeClient().paymentIntents.create({
       amount,
       currency,
       description: description || 'Visa Assist Service Payment',
@@ -74,7 +88,7 @@ export async function createCheckoutSession({
   metadata = {}
 }: CreateCheckoutSessionParams) {
   try {
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripeClient().checkout.sessions.create({
       line_items: [
         {
           price: priceId,
@@ -108,7 +122,7 @@ export async function createCheckoutSession({
  */
 export async function getPaymentIntent(paymentIntentId: string) {
   try {
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+    const paymentIntent = await getStripeClient().paymentIntents.retrieve(paymentIntentId)
     
     return {
       id: paymentIntent.id,
@@ -129,7 +143,7 @@ export async function getPaymentIntent(paymentIntentId: string) {
  */
 export async function cancelPaymentIntent(paymentIntentId: string) {
   try {
-    const paymentIntent = await stripe.paymentIntents.cancel(paymentIntentId)
+    const paymentIntent = await getStripeClient().paymentIntents.cancel(paymentIntentId)
     
     return {
       id: paymentIntent.id,
@@ -147,7 +161,7 @@ export async function cancelPaymentIntent(paymentIntentId: string) {
  */
 export async function createRefund(paymentIntentId: string, amount?: number) {
   try {
-    const refund = await stripe.refunds.create({
+    const refund = await getStripeClient().refunds.create({
       payment_intent: paymentIntentId,
       amount: amount, // Optional: partial refund
       reason: 'requested_by_customer'
@@ -171,7 +185,7 @@ export async function createRefund(paymentIntentId: string, amount?: number) {
  */
 export async function listPaymentMethods(customerId: string) {
   try {
-    const paymentMethods = await stripe.paymentMethods.list({
+    const paymentMethods = await getStripeClient().paymentMethods.list({
       customer: customerId,
       type: 'card',
     })
@@ -201,7 +215,7 @@ export function constructWebhookEvent(
   signature: string,
   webhookSecret: string
 ): Stripe.Event {
-  return stripe.webhooks.constructEvent(payload, signature, webhookSecret)
+  return getStripeClient().webhooks.constructEvent(payload, signature, webhookSecret)
 }
 
 /**

@@ -265,12 +265,15 @@ function mapPayPalStatus(paypalStatus: string): PaymentStatus {
 export {
   stripe,
   createPaymentIntent,
-  confirmPaymentIntent,
-  refundPayment as stripeRefundPayment,
+  createCheckoutSession,
+  getPaymentIntent,
+  cancelPaymentIntent,
+  createRefund,
+  listPaymentMethods,
   constructWebhookEvent,
   handleWebhookEvent as handleStripeWebhookEvent,
-  type StripePaymentIntent,
-  type StripeRefund,
+  type CreatePaymentIntentParams,
+  type CreateCheckoutSessionParams,
 } from './stripe'
 
 export {
