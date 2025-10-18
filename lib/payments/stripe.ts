@@ -260,6 +260,3 @@ export async function handleWebhookEvent(event: Stripe.Event) {
       }
   }
 }
-
-// Export Stripe instance for advanced usage
-export { stripe }
