@@ -126,9 +126,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Stripe webhooks require raw body
-export const config = {
-  api: {
-    bodyParser: false
-  }
-}

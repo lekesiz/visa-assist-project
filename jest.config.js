@@ -8,7 +8,7 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/tests/setup/jest.setup.ts'],
-  testEnvironment: 'jest-environment-jsdom',
+  testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/', '/.next/', '/e2e/'],
   moduleNameMapper: {
     // Handle module aliases
@@ -22,6 +22,9 @@ const customJestConfig = {
     '^@/services/(.*)$': '<rootDir>/lib/services/$1',
     '^@/features/(.*)$': '<rootDir>/components/features/$1',
     '^@/ui/(.*)$': '<rootDir>/components/ui/$1',
+    
+    // Mock AI SDK modules
+    '@anthropic-ai/sdk': '<rootDir>/tests/setup/__mocks__/@anthropic-ai/sdk.js',
     
     // Handle CSS imports (with CSS modules)
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
@@ -50,10 +53,6 @@ const customJestConfig = {
       statements: 70,
     },
   },
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname',
-  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

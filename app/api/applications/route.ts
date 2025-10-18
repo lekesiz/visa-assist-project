@@ -34,6 +34,10 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
   // Validate query parameters
   const searchParams = new URL(request.url).searchParams
   const params = validateQueryParams(searchParams, listApplicationsQuerySchema)
+  
+  // Ensure required pagination values are set
+  const page = params.page ?? 1
+  const limit = params.limit ?? 20
 
   // Build query
   let query = supabase
@@ -71,9 +75,9 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
   }
 
   // Apply pagination
-  const offset = (params.page - 1) * params.limit
+  const offset = (page - 1) * limit
   const { data, error, count } = await query
-    .range(offset, offset + params.limit - 1)
+    .range(offset, offset + limit - 1)
 
   if (error) {
     console.error('Database error fetching applications:', error)

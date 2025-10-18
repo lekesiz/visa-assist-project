@@ -1,0 +1,587 @@
+{
+  "scanDate": "2025-10-18T06:46:20.523Z",
+  "summary": {
+    "routesScanned": 28,
+    "totalIssues": 39,
+    "critical": 3,
+    "high": 32,
+    "medium": 3,
+    "low": 1
+  },
+  "routes": [
+    {
+      "path": "/api/ai/analyze-document",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/ai/analyze-document/route.ts",
+      "relativePath": "app/api/ai/analyze-document/route.ts"
+    },
+    {
+      "path": "/api/ai/denklik-analysis",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/ai/denklik-analysis/route.ts",
+      "relativePath": "app/api/ai/denklik-analysis/route.ts"
+    },
+    {
+      "path": "/api/ai/immigration-roadmap",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/ai/immigration-roadmap/route.ts",
+      "relativePath": "app/api/ai/immigration-roadmap/route.ts"
+    },
+    {
+      "path": "/api/ai/job-match",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/ai/job-match/route.ts",
+      "relativePath": "app/api/ai/job-match/route.ts"
+    },
+    {
+      "path": "/api/ai/recommend-visa",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/ai/recommend-visa/route.ts",
+      "relativePath": "app/api/ai/recommend-visa/route.ts"
+    },
+    {
+      "path": "/api/applications/[id]/notes",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/applications/[id]/notes/route.ts",
+      "relativePath": "app/api/applications/[id]/notes/route.ts"
+    },
+    {
+      "path": "/api/applications/[id]",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/applications/[id]/route.ts",
+      "relativePath": "app/api/applications/[id]/route.ts"
+    },
+    {
+      "path": "/api/applications/[id]/timeline",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/applications/[id]/timeline/route.ts",
+      "relativePath": "app/api/applications/[id]/timeline/route.ts"
+    },
+    {
+      "path": "/api/applications",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/applications/route.ts",
+      "relativePath": "app/api/applications/route.ts"
+    },
+    {
+      "path": "/api/applications/stats",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/applications/stats/route.ts",
+      "relativePath": "app/api/applications/stats/route.ts"
+    },
+    {
+      "path": "/api/appointments/[id]",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/appointments/[id]/route.ts",
+      "relativePath": "app/api/appointments/[id]/route.ts"
+    },
+    {
+      "path": "/api/appointments/available-slots",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/appointments/available-slots/route.ts",
+      "relativePath": "app/api/appointments/available-slots/route.ts"
+    },
+    {
+      "path": "/api/appointments",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/appointments/route.ts",
+      "relativePath": "app/api/appointments/route.ts"
+    },
+    {
+      "path": "/api/documents/upload",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/documents/upload/route.ts",
+      "relativePath": "app/api/documents/upload/route.ts"
+    },
+    {
+      "path": "/api/email/send",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/email/send/route.ts",
+      "relativePath": "app/api/email/send/route.ts"
+    },
+    {
+      "path": "/api/health",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/health/route.ts",
+      "relativePath": "app/api/health/route.ts"
+    },
+    {
+      "path": "/api/jobs/[id]",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/jobs/[id]/route.ts",
+      "relativePath": "app/api/jobs/[id]/route.ts"
+    },
+    {
+      "path": "/api/jobs/saved",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/jobs/saved/route.ts",
+      "relativePath": "app/api/jobs/saved/route.ts"
+    },
+    {
+      "path": "/api/jobs/search",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/jobs/search/route.ts",
+      "relativePath": "app/api/jobs/search/route.ts"
+    },
+    {
+      "path": "/api/notifications/preferences",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/notifications/preferences/route.ts",
+      "relativePath": "app/api/notifications/preferences/route.ts"
+    },
+    {
+      "path": "/api/notifications",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/notifications/route.ts",
+      "relativePath": "app/api/notifications/route.ts"
+    },
+    {
+      "path": "/api/notifications/subscribe",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/notifications/subscribe/route.ts",
+      "relativePath": "app/api/notifications/subscribe/route.ts"
+    },
+    {
+      "path": "/api/payments/confirm",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/payments/confirm/route.ts",
+      "relativePath": "app/api/payments/confirm/route.ts"
+    },
+    {
+      "path": "/api/payments/create",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/payments/create/route.ts",
+      "relativePath": "app/api/payments/create/route.ts"
+    },
+    {
+      "path": "/api/payments/refund",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/payments/refund/route.ts",
+      "relativePath": "app/api/payments/refund/route.ts"
+    },
+    {
+      "path": "/api/payments/webhooks/paypal",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/payments/webhooks/paypal/route.ts",
+      "relativePath": "app/api/payments/webhooks/paypal/route.ts"
+    },
+    {
+      "path": "/api/payments/webhooks/stripe",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/payments/webhooks/stripe/route.ts",
+      "relativePath": "app/api/payments/webhooks/stripe/route.ts"
+    },
+    {
+      "path": "/api/stripe/create-payment-intent",
+      "filePath": "/Users/mikail/visa-assist-project/app/api/stripe/create-payment-intent/route.ts",
+      "relativePath": "app/api/stripe/create-payment-intent/route.ts"
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "route": "/api/ai/analyze-document",
+      "method": "POST",
+      "file": "app/api/ai/analyze-document/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/ai/denklik-analysis",
+      "method": "POST",
+      "file": "app/api/ai/denklik-analysis/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/ai/immigration-roadmap",
+      "method": "POST",
+      "file": "app/api/ai/immigration-roadmap/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/ai/immigration-roadmap",
+      "method": "PUT",
+      "file": "app/api/ai/immigration-roadmap/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PUT method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/ai/job-match",
+      "method": "POST",
+      "file": "app/api/ai/job-match/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/ai/recommend-visa",
+      "method": "POST",
+      "file": "app/api/ai/recommend-visa/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/applications/[id]/notes",
+      "method": "POST",
+      "file": "app/api/applications/[id]/notes/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/applications/[id]/notes",
+      "method": "PUT",
+      "file": "app/api/applications/[id]/notes/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PUT method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/applications/[id]",
+      "method": "PUT",
+      "file": "app/api/applications/[id]/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PUT method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/applications/[id]",
+      "method": "PATCH",
+      "file": "app/api/applications/[id]/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PATCH method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/applications/stats",
+      "method": "POST",
+      "file": "app/api/applications/stats/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/appointments/[id]",
+      "method": "PUT",
+      "file": "app/api/appointments/[id]/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PUT method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/appointments/[id]",
+      "method": "PATCH",
+      "file": "app/api/appointments/[id]/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PATCH method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/appointments/available-slots",
+      "method": "POST",
+      "file": "app/api/appointments/available-slots/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/appointments",
+      "method": "POST",
+      "file": "app/api/appointments/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/documents/upload",
+      "method": "POST",
+      "file": "app/api/documents/upload/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/email/send",
+      "method": "POST",
+      "file": "app/api/email/send/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/health",
+      "method": "GET",
+      "file": "app/api/health/route.ts",
+      "severity": "CRITICAL",
+      "category": "missing-security-control",
+      "description": "Missing Authentication check for GET method",
+      "recommendation": "Implement user authentication check using middleware or route-level validation",
+      "evidence": "No authentication patterns found"
+    },
+    {
+      "route": "/api/jobs/[id]",
+      "method": "POST",
+      "file": "app/api/jobs/[id]/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/jobs/saved",
+      "method": "POST",
+      "file": "app/api/jobs/saved/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/jobs/search",
+      "method": "POST",
+      "file": "app/api/jobs/search/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/notifications/preferences",
+      "method": "POST",
+      "file": "app/api/notifications/preferences/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/notifications/preferences",
+      "method": "PUT",
+      "file": "app/api/notifications/preferences/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PUT method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "POST",
+      "file": "app/api/notifications/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/notifications",
+      "method": "PATCH",
+      "file": "app/api/notifications/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for PATCH method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/notifications/subscribe",
+      "method": "POST",
+      "file": "app/api/notifications/subscribe/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/payments/confirm",
+      "method": "POST",
+      "file": "app/api/payments/confirm/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/payments/create",
+      "method": "POST",
+      "file": "app/api/payments/create/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/payments/refund",
+      "method": "POST",
+      "file": "app/api/payments/refund/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/payments/webhooks/paypal",
+      "method": "POST",
+      "file": "app/api/payments/webhooks/paypal/route.ts",
+      "severity": "CRITICAL",
+      "category": "missing-security-control",
+      "description": "Missing Authentication check for POST method",
+      "recommendation": "Implement user authentication check using middleware or route-level validation",
+      "evidence": "No authentication patterns found"
+    },
+    {
+      "route": "/api/payments/webhooks/paypal",
+      "method": "POST",
+      "file": "app/api/payments/webhooks/paypal/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/payments/webhooks/stripe",
+      "method": "POST",
+      "file": "app/api/payments/webhooks/stripe/route.ts",
+      "severity": "CRITICAL",
+      "category": "missing-security-control",
+      "description": "Missing Authentication check for POST method",
+      "recommendation": "Implement user authentication check using middleware or route-level validation",
+      "evidence": "No authentication patterns found"
+    },
+    {
+      "route": "/api/payments/webhooks/stripe",
+      "method": "POST",
+      "file": "app/api/payments/webhooks/stripe/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "/api/stripe/create-payment-intent",
+      "method": "POST",
+      "file": "app/api/stripe/create-payment-intent/route.ts",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing Input validation for POST method",
+      "recommendation": "Use schema validation libraries like Zod or Joi to validate inputs",
+      "evidence": "No inputValidation patterns found"
+    },
+    {
+      "route": "global",
+      "file": "middleware.ts",
+      "severity": "MEDIUM",
+      "category": "missing-security-control",
+      "description": "Missing Rate limiting in middleware",
+      "recommendation": "Implement Rate limiting in global middleware"
+    },
+    {
+      "route": "global",
+      "file": "middleware.ts",
+      "severity": "LOW",
+      "category": "missing-security-control",
+      "description": "Missing CORS configuration in middleware",
+      "recommendation": "Implement CORS configuration in global middleware"
+    },
+    {
+      "route": "global",
+      "file": "next.config.js",
+      "severity": "MEDIUM",
+      "category": "missing-security-control",
+      "description": "Missing security header: Strict-Transport-Security",
+      "recommendation": "Add Strict-Transport-Security to Next.js security headers configuration"
+    },
+    {
+      "route": "global",
+      "file": "next.config.js",
+      "severity": "HIGH",
+      "category": "missing-security-control",
+      "description": "Missing security header: Content-Security-Policy",
+      "recommendation": "Add Content-Security-Policy to Next.js security headers configuration"
+    },
+    {
+      "route": "global",
+      "file": "next.config.js",
+      "severity": "MEDIUM",
+      "category": "configuration",
+      "description": "SVG uploads allowed without proper CSP",
+      "recommendation": "Ensure proper Content Security Policy when allowing SVG uploads"
+    }
+  ],
+  "warnings": [
+    "/api/ai/analyze-document POST: Consider implementing Rate limiting",
+    "/api/ai/job-match GET: Consider implementing Rate limiting",
+    "/api/ai/job-match POST: Consider implementing Rate limiting",
+    "/api/ai/recommend-visa POST: Consider implementing Rate limiting",
+    "/api/applications/[id]/notes GET: Consider implementing Rate limiting",
+    "/api/applications/[id]/notes POST: Consider implementing Rate limiting",
+    "/api/applications/[id]/notes PUT: Consider implementing Rate limiting",
+    "/api/applications/[id]/notes DELETE: Consider implementing Rate limiting",
+    "/api/applications/[id] GET: Consider implementing Rate limiting",
+    "/api/applications/[id] PUT: Consider implementing Rate limiting",
+    "/api/applications/[id] DELETE: Consider implementing Rate limiting",
+    "/api/applications/[id] PATCH: Consider implementing Rate limiting",
+    "/api/applications/[id]/timeline GET: Consider implementing Rate limiting",
+    "/api/appointments/available-slots GET: Consider implementing Rate limiting",
+    "/api/appointments/available-slots POST: Consider implementing Rate limiting",
+    "/api/documents/upload GET: Consider implementing Rate limiting",
+    "/api/documents/upload POST: Consider implementing Rate limiting",
+    "/api/email/send GET: Consider implementing Rate limiting",
+    "/api/email/send POST: Consider implementing Rate limiting",
+    "/api/jobs/[id] GET: Consider implementing Rate limiting",
+    "/api/jobs/[id] POST: Consider implementing Rate limiting",
+    "/api/jobs/[id] DELETE: Consider implementing Rate limiting",
+    "/api/jobs/saved GET: Consider implementing Rate limiting",
+    "/api/jobs/saved POST: Consider implementing Rate limiting",
+    "/api/notifications/preferences GET: Consider implementing Rate limiting",
+    "/api/notifications/preferences POST: Consider implementing Rate limiting",
+    "/api/notifications/preferences PUT: Consider implementing Rate limiting",
+    "/api/notifications GET: Consider implementing Rate limiting",
+    "/api/notifications POST: Consider implementing Rate limiting",
+    "/api/notifications DELETE: Consider implementing Rate limiting",
+    "/api/notifications PATCH: Consider implementing Rate limiting",
+    "/api/notifications/subscribe GET: Consider implementing Rate limiting",
+    "/api/notifications/subscribe POST: Consider implementing Rate limiting",
+    "/api/notifications/subscribe DELETE: Consider implementing Rate limiting",
+    "/api/payments/confirm POST: Consider implementing Rate limiting",
+    "/api/payments/create GET: Consider implementing Rate limiting",
+    "/api/payments/create POST: Consider implementing Rate limiting",
+    "/api/payments/refund POST: Consider implementing Rate limiting",
+    "/api/payments/webhooks/paypal POST: Consider implementing Rate limiting",
+    "/api/payments/webhooks/stripe POST: Consider implementing Rate limiting",
+    "/api/stripe/create-payment-intent POST: Consider implementing Rate limiting"
+  ],
+  "recommendations": [
+    "Implement comprehensive input validation",
+    "Add authentication to all protected endpoints",
+    "Use rate limiting to prevent abuse",
+    "Implement proper error handling",
+    "Add security headers to all responses",
+    "Use HTTPS for all communications",
+    "Regular security audits and penetration testing"
+  ]
+}

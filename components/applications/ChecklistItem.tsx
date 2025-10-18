@@ -1,4 +1,4 @@
-import { Check, Circle, AlertCircle, Lock } from 'lucide-react'
+import { Check, Circle, AlertCircle, Lock, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface ChecklistItemProps {

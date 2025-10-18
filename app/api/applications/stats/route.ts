@@ -210,17 +210,14 @@ export async function POST(request: NextRequest) {
     const { reportType = 'summary', startDate, endDate, format = 'json' } = await request.json()
 
     // Build date filter
-    let dateFilter = {}
+    let dateFilter: any = {}
     if (startDate) {
-      dateFilter = { 
-        ...dateFilter, 
-        created_at: { gte: startDate } 
-      }
+      dateFilter.created_at = { gte: startDate }
     }
     if (endDate) {
-      dateFilter = { 
-        ...dateFilter, 
-        created_at: { ...dateFilter.created_at, lte: endDate } 
+      dateFilter.created_at = { 
+        ...dateFilter.created_at, 
+        lte: endDate 
       }
     }
 

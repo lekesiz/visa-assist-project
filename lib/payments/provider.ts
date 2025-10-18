@@ -1,6 +1,3 @@
-import * as stripeService from './stripe'
-import * as paypalService from './paypal'
-
 export type PaymentProvider = 'stripe' | 'paypal'
 export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'refunded'
 
@@ -44,8 +41,9 @@ export async function createPayment({
   metadata = {}
 }: CreatePaymentParams): Promise<PaymentResult> {
   switch (provider) {
-    case 'stripe':
+    case 'stripe': {
       // For Stripe, create a payment intent
+      const stripeService = await import('./stripe')
       const stripeResult = await stripeService.createPaymentIntent({
         amount: amount.amount,
         currency: amount.currency,
@@ -63,9 +61,11 @@ export async function createPayment({
         clientSecret: stripeResult.clientSecret,
         metadata
       }
+    }
 
-    case 'paypal':
+    case 'paypal': {
       // For PayPal, create an order
+      const paypalService = await import('./paypal')
       const paypalResult = await paypalService.createOrder({
         amount: (amount.amount / 100).toFixed(2), // Convert cents to decimal
         currency: amount.currency,
@@ -84,6 +84,7 @@ export async function createPayment({
         approvalUrl: paypalResult.approvalUrl,
         metadata
       }
+    }
 
     default:
       throw new Error(`Unsupported payment provider: ${provider}`)
@@ -98,8 +99,9 @@ export async function confirmPayment(
   paymentId: string
 ): Promise<PaymentResult> {
   switch (provider) {
-    case 'stripe':
+    case 'stripe': {
       // Stripe payment intents are confirmed client-side
+      const stripeService = await import('./stripe')
       const stripePayment = await stripeService.getPaymentIntent(paymentId)
       
       return {
@@ -112,9 +114,11 @@ export async function confirmPayment(
         },
         metadata: stripePayment.metadata
       }
+    }
 
-    case 'paypal':
+    case 'paypal': {
       // Capture PayPal order after approval
+      const paypalService = await import('./paypal')
       const paypalCapture = await paypalService.captureOrder(paymentId)
       
       return {
@@ -130,6 +134,7 @@ export async function confirmPayment(
           applicationId: paypalCapture.applicationId
         }
       }
+    }
 
     default:
       throw new Error(`Unsupported payment provider: ${provider}`)

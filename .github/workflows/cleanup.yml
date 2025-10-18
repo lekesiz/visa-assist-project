@@ -1,0 +1,368 @@
+name: Cleanup and Maintenance
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  cleanup-old-deployments:
+    name: Cleanup Old Deployments
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Cleanup old deployments
+        run: |
+          echo "Cleaning up old Vercel deployments..."
+          
+          # Keep only the last 20 deployments
+          vercel ls --token=${{ secrets.VERCEL_TOKEN }} | tail -n +21 | while read deployment; do
+            DEPLOYMENT_URL=$(echo $deployment | awk '{print $1}')
+            if [ ! -z "$DEPLOYMENT_URL" ]; then
+              echo "Removing old deployment: $DEPLOYMENT_URL"
+              vercel rm "$DEPLOYMENT_URL" --yes --token=${{ secrets.VERCEL_TOKEN }} || true
+            fi
+          done
+
+  cleanup-old-artifacts:
+    name: Cleanup Old Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cleanup old artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 30); // Keep artifacts for 30 days
+            
+            let deletedCount = 0;
+            
+            for (const artifact of artifacts.data.artifacts) {
+              const createdAt = new Date(artifact.created_at);
+              
+              if (createdAt < cutoffDate) {
+                try {
+                  await github.rest.actions.deleteArtifact({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    artifact_id: artifact.id
+                  });
+                  console.log(`Deleted artifact: ${artifact.name} (${artifact.id})`);
+                  deletedCount++;
+                } catch (error) {
+                  console.log(`Failed to delete artifact ${artifact.name}: ${error.message}`);
+                }
+              }
+            }
+            
+            console.log(`Cleaned up ${deletedCount} old artifacts`);
+
+  cleanup-old-workflow-runs:
+    name: Cleanup Old Workflow Runs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cleanup old workflow runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflows = await github.rest.actions.listRepoWorkflows({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 90); // Keep runs for 90 days
+            
+            let deletedCount = 0;
+            
+            for (const workflow of workflows.data.workflows) {
+              const runs = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflow.id,
+                per_page: 100
+              });
+              
+              for (const run of runs.data.workflow_runs) {
+                const createdAt = new Date(run.created_at);
+                
+                if (createdAt < cutoffDate && run.status === 'completed') {
+                  try {
+                    await github.rest.actions.deleteWorkflowRun({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      run_id: run.id
+                    });
+                    console.log(`Deleted workflow run: ${run.id} from ${workflow.name}`);
+                    deletedCount++;
+                  } catch (error) {
+                    console.log(`Failed to delete run ${run.id}: ${error.message}`);
+                  }
+                }
+              }
+            }
+            
+            console.log(`Cleaned up ${deletedCount} old workflow runs`);
+
+  health-check-monitoring:
+    name: Health Check Monitoring
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check production health
+        run: |
+          echo "Checking production health..."
+          
+          # Check main endpoints
+          endpoints=(
+            "https://visaassist.ai"
+            "https://visaassist.ai/api/health"
+            "https://visaassist.ai/login"
+            "https://visaassist.ai/dashboard"
+          )
+          
+          failed_endpoints=()
+          
+          for endpoint in "${endpoints[@]}"; do
+            echo "Checking $endpoint..."
+            
+            if curl -f -s -m 30 "$endpoint" > /dev/null; then
+              echo "✅ $endpoint is healthy"
+            else
+              echo "❌ $endpoint is unhealthy"
+              failed_endpoints+=("$endpoint")
+            fi
+          done
+          
+          if [ ${#failed_endpoints[@]} -gt 0 ]; then
+            echo "Failed endpoints: ${failed_endpoints[*]}"
+            exit 1
+          fi
+
+      - name: Check staging health
+        run: |
+          echo "Checking staging health..."
+          
+          staging_endpoints=(
+            "https://staging.visaassist.ai"
+            "https://staging.visaassist.ai/api/health"
+          )
+          
+          for endpoint in "${staging_endpoints[@]}"; do
+            echo "Checking $endpoint..."
+            
+            if curl -f -s -m 30 "$endpoint" > /dev/null; then
+              echo "✅ $endpoint is healthy"
+            else
+              echo "⚠️ $endpoint is unhealthy (staging)"
+            fi
+          done
+
+      - name: Create health check issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = \`## 🚨 Health Check Failed
+            
+            One or more health checks have failed during the automated monitoring.
+            
+            **Failed at**: \${new Date().toISOString()}
+            **Workflow**: [Cleanup and Maintenance](\${context.payload.repository.html_url}/actions/workflows/cleanup.yml)
+            
+            ### Immediate Actions Required
+            
+            1. **Check application status** on both production and staging
+            2. **Review recent deployments** for any issues
+            3. **Check server resources** and performance metrics
+            4. **Verify database connectivity**
+            5. **Check external service dependencies**
+            
+            ### Quick Diagnosis
+            
+            \\\`\\\`\\\`bash
+            # Check production health
+            curl -I https://visaassist.ai/api/health
+            
+            # Check staging health  
+            curl -I https://staging.visaassist.ai/api/health
+            
+            # Check Vercel deployment status
+            vercel ls --prod
+            \\\`\\\`\\\`
+            
+            **This issue was automatically generated by the health monitoring system.**
+            \`;
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: \`🚨 Health Check Failed - \${new Date().toISOString().split('T')[0]}\`,
+              body: body,
+              labels: ['bug', 'health-check', 'automated', 'urgent']
+            });
+            
+            console.log(\`Created health check issue #\${issue.data.number}\`);
+
+  disk-usage-check:
+    name: Disk Usage Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check repository size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            const sizeKB = repo.data.size;
+            const sizeMB = (sizeKB / 1024).toFixed(2);
+            
+            console.log(\`Repository size: \${sizeMB} MB\`);
+            
+            // Alert if repository is getting large (> 500MB)
+            if (sizeKB > 500 * 1024) {
+              const body = \`## 📦 Repository Size Alert
+              
+              The repository size has grown to **\${sizeMB} MB**.
+              
+              ### Recommended Actions
+              
+              1. **Review large files** in the repository
+              2. **Clean up old artifacts** and build outputs
+              3. **Use Git LFS** for large binary files
+              4. **Remove unused dependencies**
+              5. **Archive old branches** if no longer needed
+              
+              ### Cleanup Commands
+              
+              \\\`\\\`\\\`bash
+              # Find large files
+              find . -type f -size +10M -ls
+              
+              # Clean up node_modules
+              rm -rf node_modules && npm ci
+              
+              # Clean up build outputs
+              rm -rf .next dist build
+              
+              # Git cleanup
+              git gc --aggressive --prune=now
+              \\\`\\\`\\\`
+              
+              **Current size**: \${sizeMB} MB
+              **Recommended maximum**: 500 MB
+              \`;
+              
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: \`📦 Repository Size Alert - \${sizeMB} MB\`,
+                body: body,
+                labels: ['maintenance', 'repository-size', 'automated']
+              });
+            }
+
+  performance-monitoring:
+    name: Performance Monitoring
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Lighthouse CLI
+        run: npm install -g @lhci/cli@latest
+
+      - name: Run Lighthouse audit
+        run: |
+          echo "Running Lighthouse audit on production..."
+          
+          lhci autorun \
+            --upload.target=temporary-public-storage \
+            --collect.url=https://visaassist.ai \
+            --collect.url=https://visaassist.ai/login \
+            --collect.url=https://visaassist.ai/dashboard || true
+
+      - name: Monitor Core Web Vitals
+        run: |
+          echo "Monitoring Core Web Vitals..."
+          
+          # Simple performance check using curl
+          start_time=$(date +%s%N)
+          curl -s https://visaassist.ai > /dev/null
+          end_time=$(date +%s%N)
+          
+          response_time=$((($end_time - $start_time) / 1000000))  # Convert to milliseconds
+          
+          echo "Response time: ${response_time}ms"
+          
+          # Alert if response time is too high (> 3 seconds)
+          if [ $response_time -gt 3000 ]; then
+            echo "⚠️ High response time detected: ${response_time}ms"
+            exit 1
+          fi
+
+  notify-maintenance-summary:
+    name: Notify Maintenance Summary
+    runs-on: ubuntu-latest
+    needs: [
+      cleanup-old-deployments,
+      cleanup-old-artifacts,
+      cleanup-old-workflow-runs,
+      health-check-monitoring,
+      disk-usage-check,
+      performance-monitoring
+    ]
+    if: always()
+
+    steps:
+      - name: Send maintenance summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = {
+              'Cleanup Deployments': '${{ needs.cleanup-old-deployments.result }}',
+              'Cleanup Artifacts': '${{ needs.cleanup-old-artifacts.result }}',
+              'Cleanup Workflow Runs': '${{ needs.cleanup-old-workflow-runs.result }}',
+              'Health Check': '${{ needs.health-check-monitoring.result }}',
+              'Disk Usage Check': '${{ needs.disk-usage-check.result }}',
+              'Performance Monitoring': '${{ needs.performance-monitoring.result }}'
+            };
+            
+            const getIcon = (status) => {
+              switch(status) {
+                case 'success': return '✅';
+                case 'failure': return '❌';
+                case 'cancelled': return '⏹️';
+                default: return '⏳';
+              }
+            };
+            
+            const hasFailures = Object.values(results).some(r => r === 'failure');
+            
+            console.log('Daily maintenance summary:');
+            Object.entries(results).forEach(([name, status]) => {
+              console.log(\`\${getIcon(status)} \${name}: \${status}\`);
+            });
+            
+            if (hasFailures) {
+              console.log('⚠️ Some maintenance tasks failed. Please review the workflow logs.');
+            } else {
+              console.log('✅ All maintenance tasks completed successfully.');
+            }

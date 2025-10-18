@@ -1,0 +1,298 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "framework": "nextjs",
+  "installCommand": "npm ci",
+  "outputDirectory": ".next",
+  
+  "build": {
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1",
+      "SKIP_ENV_VALIDATION": "1"
+    }
+  },
+
+  "functions": {
+    "app/api/**": {
+      "maxDuration": 30
+    },
+    "app/api/ai/**": {
+      "maxDuration": 60
+    },
+    "app/api/documents/upload/**": {
+      "maxDuration": 30
+    },
+    "app/api/payments/**": {
+      "maxDuration": 25
+    }
+  },
+
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(css|js|woff|woff2|ttf|eot|svg|png|jpg|jpeg|gif|ico|webp|avif))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/signin",
+      "destination": "/login",
+      "permanent": true
+    },
+    {
+      "source": "/signup",
+      "destination": "/register",
+      "permanent": true
+    },
+    {
+      "source": "/sign-in",
+      "destination": "/login",
+      "permanent": true
+    },
+    {
+      "source": "/sign-up",
+      "destination": "/register",
+      "permanent": true
+    },
+    {
+      "source": "/auth/signin",
+      "destination": "/login",
+      "permanent": true
+    },
+    {
+      "source": "/auth/signup",
+      "destination": "/register",
+      "permanent": true
+    },
+    {
+      "source": "/app",
+      "destination": "/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/panel",
+      "destination": "/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/profile",
+      "destination": "/dashboard/profile",
+      "permanent": true
+    },
+    {
+      "source": "/settings",
+      "destination": "/dashboard/profile",
+      "permanent": true
+    },
+    {
+      "source": "/applications",
+      "destination": "/dashboard/applications",
+      "permanent": true
+    },
+    {
+      "source": "/documents",
+      "destination": "/dashboard/documents",
+      "permanent": true
+    },
+    {
+      "source": "/payments",
+      "destination": "/dashboard/payments",
+      "permanent": true
+    },
+    {
+      "source": "/billing",
+      "destination": "/dashboard/payments",
+      "permanent": true
+    },
+    {
+      "source": "/appointments",
+      "destination": "/dashboard/appointments",
+      "permanent": true
+    },
+    {
+      "source": "/docs",
+      "destination": "/faq",
+      "permanent": false
+    },
+    {
+      "source": "/help",
+      "destination": "/contact",
+      "permanent": false
+    },
+    {
+      "source": "/support",
+      "destination": "/contact",
+      "permanent": false
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.visaassist.ai"
+        }
+      ],
+      "destination": "https://visaassist.ai/$1",
+      "permanent": true
+    }
+  ],
+
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/status",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/ping",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/webhooks/stripe",
+      "destination": "/api/payments/webhooks/stripe"
+    },
+    {
+      "source": "/webhooks/paypal",
+      "destination": "/api/payments/webhooks/paypal"
+    },
+    {
+      "source": "/webhooks/sendgrid",
+      "destination": "/api/email/webhooks/sendgrid"
+    },
+    {
+      "source": "/oauth/google",
+      "destination": "/api/auth/callback/google"
+    },
+    {
+      "source": "/oauth/microsoft",
+      "destination": "/api/auth/callback/microsoft"
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+
+  "trailingSlash": false,
+
+  "cleanUrls": true,
+
+  "regions": ["fra1", "iad1"],
+
+  "env": {
+    "NEXT_PUBLIC_VERCEL_ENV": "@vercel-env",
+    "VERCEL_URL": "@vercel-url"
+  },
+
+  "github": {
+    "enabled": false
+  },
+
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-temp-files",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/send-reminders",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/update-job-listings",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/backup-data",
+      "schedule": "0 2 * * 0"
+    }
+  ]
+}

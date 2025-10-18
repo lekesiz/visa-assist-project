@@ -1,0 +1,276 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  check-dependencies:
+    name: Check for Dependency Updates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Check for outdated dependencies
+        run: |
+          npm outdated --json > outdated.json || true
+          cat outdated.json
+
+      - name: Create dependency update issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let outdated = {};
+            try {
+              outdated = JSON.parse(fs.readFileSync('outdated.json', 'utf8'));
+            } catch (error) {
+              console.log('No outdated dependencies found');
+              return;
+            }
+            
+            if (Object.keys(outdated).length === 0) {
+              console.log('All dependencies are up to date');
+              return;
+            }
+            
+            const updates = Object.entries(outdated).map(([name, info]) => {
+              const current = info.current || 'N/A';
+              const wanted = info.wanted || 'N/A';
+              const latest = info.latest || 'N/A';
+              const type = info.type || 'dependency';
+              
+              return `| ${name} | ${current} | ${wanted} | ${latest} | ${type} |`;
+            }).join('\n');
+            
+            const body = \`## 📦 Weekly Dependency Update Report
+            
+            The following dependencies have updates available:
+            
+            | Package | Current | Wanted | Latest | Type |
+            |---------|---------|--------|--------|------|
+            \${updates}
+            
+            ### Recommended Actions
+            
+            1. **Review each update** for breaking changes
+            2. **Test updates in development** environment first
+            3. **Update dependencies incrementally** to isolate issues
+            4. **Run full test suite** after each update
+            
+            ### Update Commands
+            
+            \\\`\\\`\\\`bash
+            # Update all dependencies to wanted versions
+            npm update
+            
+            # Update specific package to latest
+            npm install package-name@latest
+            
+            # Check for security vulnerabilities
+            npm audit
+            \\\`\\\`\\\`
+            
+            **Generated on**: \${new Date().toISOString()}
+            **Workflow**: [Dependency Updates](\${context.payload.repository.html_url}/actions/workflows/dependency-updates.yml)
+            \`;
+            
+            // Check if there's already an open dependency update issue
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'dependencies,automated'
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('Weekly Dependency Update Report')
+            );
+            
+            if (existingIssue) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: body
+              });
+              console.log(\`Updated existing issue #\${existingIssue.number}\`);
+            } else {
+              // Create new issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: \`📦 Weekly Dependency Update Report - \${new Date().toISOString().split('T')[0]}\`,
+                body: body,
+                labels: ['dependencies', 'automated', 'maintenance']
+              });
+              console.log(\`Created new issue #\${issue.data.number}\`);
+            }
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: |
+          npm audit --json > audit.json || true
+          cat audit.json
+
+      - name: Create security issue if vulnerabilities found
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let audit = {};
+            try {
+              audit = JSON.parse(fs.readFileSync('audit.json', 'utf8'));
+            } catch (error) {
+              console.log('No audit data available');
+              return;
+            }
+            
+            if (!audit.vulnerabilities || Object.keys(audit.vulnerabilities).length === 0) {
+              console.log('No vulnerabilities found');
+              return;
+            }
+            
+            const vulnerabilities = Object.entries(audit.vulnerabilities).map(([name, vuln]) => {
+              const severity = vuln.severity || 'unknown';
+              const range = vuln.range || 'N/A';
+              const title = vuln.title || 'No title';
+              
+              return \`| \${name} | \${severity} | \${range} | \${title} |\`;
+            }).join('\n');
+            
+            const criticalCount = Object.values(audit.vulnerabilities).filter(v => v.severity === 'critical').length;
+            const highCount = Object.values(audit.vulnerabilities).filter(v => v.severity === 'high').length;
+            const moderateCount = Object.values(audit.vulnerabilities).filter(v => v.severity === 'moderate').length;
+            
+            const priority = criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'HIGH' : 'MODERATE';
+            
+            const body = \`## 🚨 Security Vulnerabilities Detected
+            
+            **Priority**: \${priority}
+            
+            ### Summary
+            - **Critical**: \${criticalCount}
+            - **High**: \${highCount}
+            - **Moderate**: \${moderateCount}
+            
+            ### Vulnerabilities
+            
+            | Package | Severity | Range | Description |
+            |---------|----------|-------|-------------|
+            \${vulnerabilities}
+            
+            ### Immediate Actions Required
+            
+            1. **Review each vulnerability** and assess impact
+            2. **Update affected packages** as soon as possible
+            3. **Run \\\`npm audit fix\\\`** to auto-fix where possible
+            4. **Test thoroughly** after applying fixes
+            5. **Deploy fixes immediately** for critical vulnerabilities
+            
+            ### Fix Commands
+            
+            \\\`\\\`\\\`bash
+            # Auto-fix vulnerabilities
+            npm audit fix
+            
+            # Force fix (may introduce breaking changes)
+            npm audit fix --force
+            
+            # Manual fix
+            npm install package-name@version
+            \\\`\\\`\\\`
+            
+            **Detected on**: \${new Date().toISOString()}
+            **Audit Command**: \\\`npm audit\\\`
+            \`;
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: \`🚨 Security Vulnerabilities Detected - \${priority} Priority\`,
+              body: body,
+              labels: ['security', 'vulnerabilities', 'automated', priority.toLowerCase()]
+            });
+            
+            console.log(\`Created security issue #\${issue.data.number}\`);
+
+  dependabot-auto-merge:
+    name: Auto-merge Dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Auto-merge minor and patch updates
+        if: |
+          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: |
+          gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on major updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = \`## ⚠️ Major Version Update
+            
+            This is a **major version update** for \${context.payload.pull_request.title}.
+            
+            **Please review carefully** before merging:
+            
+            1. **Check breaking changes** in the package changelog
+            2. **Run full test suite** to ensure compatibility
+            3. **Test manually** in development environment
+            4. **Update code** if necessary for breaking changes
+            
+            This PR will NOT be auto-merged due to the major version change.
+            \`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

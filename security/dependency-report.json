@@ -1,0 +1,61 @@
+{
+  "scanDate": "2025-10-18T06:46:23.553Z",
+  "summary": {
+    "vulnerabilities": 0,
+    "outdatedPackages": 5,
+    "licenseIssues": 1
+  },
+  "vulnerabilities": [],
+  "outdatedPackages": [
+    {
+      "package": "@supabase/auth-helpers-nextjs",
+      "version": "^0.8.7",
+      "severity": "MEDIUM",
+      "description": "Package is in pre-1.0 version",
+      "recommendation": "Consider if this package is still maintained"
+    },
+    {
+      "package": "class-variance-authority",
+      "version": "^0.7.1",
+      "severity": "MEDIUM",
+      "description": "Package is in pre-1.0 version",
+      "recommendation": "Consider if this package is still maintained"
+    },
+    {
+      "package": "lucide-react",
+      "version": "^0.312.0",
+      "severity": "MEDIUM",
+      "description": "Package is in pre-1.0 version",
+      "recommendation": "Consider if this package is still maintained"
+    },
+    {
+      "package": "sharp",
+      "version": "^0.33.2",
+      "severity": "MEDIUM",
+      "description": "Package is in pre-1.0 version",
+      "recommendation": "Consider if this package is still maintained"
+    },
+    {
+      "package": "prettier-plugin-tailwindcss",
+      "version": "^0.5.11",
+      "severity": "MEDIUM",
+      "description": "Package is in pre-1.0 version",
+      "recommendation": "Consider if this package is still maintained"
+    }
+  ],
+  "licenses": [
+    {
+      "package": "visa-assist-project",
+      "license": "Unknown",
+      "severity": "LOW",
+      "description": "No license specified"
+    }
+  ],
+  "recommendations": [
+    "Update vulnerable packages immediately",
+    "Implement automated dependency scanning",
+    "Regular security audits",
+    "Use lock files for consistent builds",
+    "Monitor for new vulnerabilities"
+  ]
+}

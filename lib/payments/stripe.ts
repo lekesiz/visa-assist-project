@@ -209,7 +209,7 @@ export function constructWebhookEvent(
  */
 export async function handleWebhookEvent(event: Stripe.Event) {
   switch (event.type) {
-    case 'payment_intent.succeeded':
+    case 'payment_intent.succeeded': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent
       return {
         type: 'payment_success',
@@ -218,16 +218,18 @@ export async function handleWebhookEvent(event: Stripe.Event) {
         currency: paymentIntent.currency,
         metadata: paymentIntent.metadata
       }
+    }
 
-    case 'payment_intent.payment_failed':
+    case 'payment_intent.payment_failed': {
       const failedPayment = event.data.object as Stripe.PaymentIntent
       return {
         type: 'payment_failed',
         paymentIntentId: failedPayment.id,
         error: failedPayment.last_payment_error?.message
       }
+    }
 
-    case 'checkout.session.completed':
+    case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
       return {
         type: 'checkout_completed',
@@ -235,6 +237,7 @@ export async function handleWebhookEvent(event: Stripe.Event) {
         paymentStatus: session.payment_status,
         metadata: session.metadata
       }
+    }
 
     default:
       return {

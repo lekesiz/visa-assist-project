@@ -1,0 +1,202 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        shard: [1, 2, 3, 4]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+
+    - name: Build application
+      run: npm run build
+
+    - name: Setup test database
+      run: |
+        # Setup test database if needed
+        echo "Setting up test database..."
+        # Add your database setup commands here
+
+    - name: Start application
+      run: |
+        npm run start &
+        sleep 10
+        # Wait for application to be ready
+        npx wait-on http://localhost:3000
+
+    - name: Run E2E tests
+      run: npx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/4
+      env:
+        E2E_BASE_URL: http://localhost:3000
+        E2E_HEADLESS: true
+        CI: true
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-results-${{ matrix.browser }}-${{ matrix.shard }}
+        path: |
+          e2e-results/
+          test-results/
+        retention-days: 7
+
+    - name: Upload screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: e2e-screenshots-${{ matrix.browser }}-${{ matrix.shard }}
+        path: e2e-results/screenshots/
+        retention-days: 7
+
+    - name: Upload videos
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: e2e-videos-${{ matrix.browser }}-${{ matrix.shard }}
+        path: e2e-results/videos/
+        retention-days: 7
+
+  mobile-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Build application
+      run: npm run build
+
+    - name: Start application
+      run: |
+        npm run start &
+        sleep 10
+        npx wait-on http://localhost:3000
+
+    - name: Run mobile E2E tests
+      run: npx playwright test --project="Mobile Chrome" --project="Mobile Safari"
+      env:
+        E2E_BASE_URL: http://localhost:3000
+        E2E_HEADLESS: true
+        CI: true
+
+    - name: Upload mobile test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: mobile-e2e-results
+        path: e2e-results/
+        retention-days: 7
+
+  lighthouse-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Start application
+      run: |
+        npm run start &
+        sleep 10
+        npx wait-on http://localhost:3000
+
+    - name: Run Lighthouse audit
+      run: |
+        npm install -g @lhci/cli@0.12.x
+        lhci autorun
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+    - name: Upload Lighthouse results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: lighthouse-results
+        path: .lighthouseci/
+        retention-days: 7
+
+  test-report:
+    runs-on: ubuntu-latest
+    needs: [e2e-tests, mobile-tests]
+    if: always()
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Generate test report
+      run: |
+        echo "# E2E Test Results" > test-report.md
+        echo "" >> test-report.md
+        echo "## Test Summary" >> test-report.md
+        echo "- Browser tests: ${{ needs.e2e-tests.result }}" >> test-report.md
+        echo "- Mobile tests: ${{ needs.mobile-tests.result }}" >> test-report.md
+        echo "" >> test-report.md
+        echo "Artifacts available in the Actions tab." >> test-report.md
+
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('test-report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report
+          });

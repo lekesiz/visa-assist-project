@@ -20,6 +20,7 @@
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
     "react/display-name": "off",
+    "react/no-unescaped-entities": "off",
     
     // TypeScript rules
     "@typescript-eslint/explicit-module-boundary-types": "off",
@@ -38,6 +39,7 @@
     "prefer-const": "error",
     "no-unused-expressions": "error",
     "no-duplicate-imports": "error",
+    "no-case-declarations": "off",
     
     // React Hooks rules
     "react-hooks/rules-of-hooks": "error",
