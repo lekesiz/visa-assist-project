@@ -141,12 +141,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       planned_travel_date: body.planned_travel_date,
       duration_of_stay: body.duration_of_stay,
       notes: body.notes,
-      status: 'draft',
-      current_step: 1,
-      total_steps: 8,
-      progress_percentage: 0,
-      checklist_items: getDefaultChecklist(body.visa_type),
-      is_premium: false
+      status: 'draft'
     })
     .select()
     .single()
