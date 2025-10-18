@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { withErrorHandler, getUserFromHeaders, NotFoundError, ConflictError } from '@/lib/error-handler'
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 import { validateRequestBody, validateQueryParams, paginationSchema, dateSchema } from '@/lib/validations/common'
+import { DemoService } from '@/lib/demo/demo-service'
 
 // Validation schemas
 const listApplicationsQuerySchema = paginationSchema.extend({
@@ -22,18 +23,34 @@ const createApplicationSchema = z.object({
 
 // GET - List all applications for the authenticated user
 export const GET = withErrorHandler(async (request: NextRequest) => {
+  // Validate query parameters first
+  const searchParams = new URL(request.url).searchParams
+  const params = validateQueryParams(searchParams, listApplicationsQuerySchema)
+
+  // Demo mode handling
+  if (DemoService.isDemoMode()) {
+    const applications = await DemoService.listApplications(params)
+    return NextResponse.json({
+      success: true,
+      data: applications,
+      pagination: {
+        page: params.page || 1,
+        limit: params.limit || 20,
+        total: applications.length,
+        totalPages: 1,
+        hasMore: false
+      }
+    })
+  }
+
   // Rate limiting
   const rateLimitResult = await checkRateLimit(request, RATE_LIMITS.read)
   if (!rateLimitResult.success) return rateLimitResult.error
 
   // Get user from middleware
   const user = getUserFromHeaders(request.headers)
-  
-  const supabase = await createClient()
 
-  // Validate query parameters
-  const searchParams = new URL(request.url).searchParams
-  const params = validateQueryParams(searchParams, listApplicationsQuerySchema)
+  const supabase = await createClient()
   
   // Ensure required pagination values are set
   const page = params.page ?? 1
@@ -99,17 +116,28 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
 
 // POST - Create a new application
 export const POST = withErrorHandler(async (request: NextRequest) => {
+  // Validate request body first
+  const body = await validateRequestBody(request, createApplicationSchema)
+
+  // Demo mode handling
+  if (DemoService.isDemoMode()) {
+    const { data, error } = await DemoService.createApplication(body)
+    if (error) throw new Error(error)
+    return NextResponse.json({
+      success: true,
+      data,
+      message: 'Application created successfully (demo mode)'
+    }, { status: 201 })
+  }
+
   // Rate limiting
   const rateLimitResult = await checkRateLimit(request, RATE_LIMITS.api)
   if (!rateLimitResult.success) return rateLimitResult.error
 
   // Get user from middleware
   const user = getUserFromHeaders(request.headers)
-  
-  const supabase = await createClient()
 
-  // Validate request body
-  const body = await validateRequestBody(request, createApplicationSchema)
+  const supabase = await createClient()
 
   // Check if user has an active application
   const { data: activeApp } = await supabase
