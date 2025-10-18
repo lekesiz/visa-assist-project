@@ -69,35 +69,35 @@ export class AIService {
   /**
    * Visa Recommendations - Uses OpenAI
    */
-  async getVisaRecommendations(userProfile: any) {
+  async getVisaRecommendations(userProfile: Record<string, any>) {
     return getVisaRecommendations(userProfile)
   }
 
   /**
    * Denklik Analysis - Uses Claude
    */
-  async analyzeDenklik(profession: string, education: any, targetState: string) {
+  async analyzeDenklik(profession: string, education: Record<string, any>, targetState: string) {
     return analyzeDenklik(profession, education, targetState)
   }
 
   /**
    * Job Matching - Uses Claude
    */
-  async matchJobs(userProfile: any, jobRequirements: any) {
+  async matchJobs(userProfile: Record<string, any>, jobRequirements: Record<string, any>) {
     return matchJobOpportunities(userProfile, jobRequirements)
   }
 
   /**
    * CV Generation - Uses OpenAI
    */
-  async generateCV(userData: any, targetJob?: string) {
+  async generateCV(userData: Record<string, any>, targetJob?: string) {
     return generateCV(userData, targetJob)
   }
 
   /**
    * Immigration Roadmap - Uses Claude
    */
-  async generateRoadmap(userProfile: any) {
+  async generateRoadmap(userProfile: Record<string, any>) {
     return generateImmigrationRoadmap(userProfile)
   }
 
@@ -106,8 +106,8 @@ export class AIService {
    */
   async request(
     task: string,
-    data: any,
-    options?: { 
+    data: Record<string, any>,
+    options?: {
       provider?: AIProvider
       preferredModel?: string
     }

@@ -17,11 +17,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Construct and verify webhook event
-    const event = constructWebhookEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+    if (!webhookSecret) {
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 500 }
+      )
+    }
+
+    const event = constructWebhookEvent(body, signature, webhookSecret)
 
     // Handle the event
     const result = await handleWebhookEvent(event)

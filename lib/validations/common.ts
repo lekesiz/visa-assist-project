@@ -42,7 +42,7 @@ export const paginationSchema = z.object({
 
 export const searchSchema = z.object({
   query: z.string().min(1).max(100),
-  filters: z.record(z.string(), z.any()).optional(),
+  filters: z.record(z.string(), z.unknown()).optional(),
   ...paginationSchema.shape,
 })
 
@@ -113,20 +113,21 @@ export function validateQueryParams<T>(
   searchParams: URLSearchParams,
   schema: z.ZodSchema<T>
 ): T {
-  const params: Record<string, any> = {}
-  
+  const params: Record<string, string | string[]> = {}
+
   searchParams.forEach((value, key) => {
     // Handle array params (e.g., ?tags=a&tags=b)
-    if (params[key]) {
-      if (Array.isArray(params[key])) {
-        params[key].push(value)
+    const current = params[key]
+    if (current) {
+      if (Array.isArray(current)) {
+        current.push(value)
       } else {
-        params[key] = [params[key], value]
+        params[key] = [current, value]
       }
     } else {
       params[key] = value
     }
   })
-  
+
   return schema.parse(params)
 }

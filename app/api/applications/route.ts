@@ -88,11 +88,11 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     success: true,
     data: data || [],
     pagination: {
-      page: params.page,
-      limit: params.limit,
+      page,
+      limit,
       total: count || 0,
-      totalPages: Math.ceil((count || 0) / params.limit),
-      hasMore: (count || 0) > offset + params.limit
+      totalPages: Math.ceil((count || 0) / limit),
+      hasMore: (count || 0) > offset + limit
     }
   })
 })

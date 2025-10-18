@@ -132,6 +132,28 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // Determine action items based on match score
+      let actionItems: string[] = []
+      if (matchResult.matchScore < 50) {
+        actionItems = [
+          'Consider gaining more relevant experience',
+          'Improve German language skills',
+          'Acquire missing technical skills'
+        ]
+      } else if (matchResult.matchScore < 70) {
+        actionItems = [
+          'Focus on addressing the identified gaps',
+          'Highlight your strengths in application',
+          'Prepare for skill-based interview questions'
+        ]
+      } else {
+        actionItems = [
+          'Apply with confidence',
+          'Prepare strong examples of your experience',
+          'Research the company culture'
+        ]
+      }
+
       // Prepare response
       const response = {
         success: true,
@@ -142,29 +164,9 @@ export async function POST(request: NextRequest) {
           recommendations: matchResult.improvementSuggestions,
           applicationTips: matchResult.applicationTips,
           overallAssessment: getMatchAssessment(matchResult.matchScore),
-          analysisId: analysisRecord?.id
+          analysisId: analysisRecord?.id,
+          actionItems
         }
-      }
-
-      // Add action items based on match score
-      if (matchResult.matchScore < 50) {
-        response.match.actionItems = [
-          'Consider gaining more relevant experience',
-          'Improve German language skills',
-          'Acquire missing technical skills'
-        ]
-      } else if (matchResult.matchScore < 70) {
-        response.match.actionItems = [
-          'Focus on addressing the identified gaps',
-          'Highlight your strengths in application',
-          'Prepare for skill-based interview questions'
-        ]
-      } else {
-        response.match.actionItems = [
-          'Apply with confidence',
-          'Prepare strong examples of your experience',
-          'Research the company culture'
-        ]
       }
 
       return NextResponse.json(response)

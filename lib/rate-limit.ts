@@ -16,16 +16,20 @@ export function rateLimit(options?: RateLimitOptions) {
     check: (limit: number, token: string) =>
       new Promise<void>((resolve, reject) => {
         const tokenCount = tokenCache.get(token) || [0]
-        
+
         if (tokenCount[0] === 0) {
           tokenCache.set(token, [1])
         } else {
           tokenCache.set(token, [tokenCount[0] + 1])
         }
 
-        const currentUsage = tokenCache.get(token)![0]
-        
-        if (currentUsage > limit) {
+        const currentUsage = tokenCache.get(token)
+        if (!currentUsage) {
+          reject(new Error('Failed to track rate limit'))
+          return
+        }
+
+        if (currentUsage[0] > limit) {
           reject(new Error('Rate limit exceeded'))
         } else {
           resolve()
