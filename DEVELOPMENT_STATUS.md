@@ -6,7 +6,7 @@
 
 ## 🏗️ Mevcut Durum
 
-**Son Güncelleme**: 18 Ocak 2025 - 12:15
+**Son Güncelleme**: 18 Ocak 2025 - 13:00
 
 ### ✅ Tamamlanan İşler
 
@@ -35,6 +35,8 @@
    - Document upload API (`/api/documents/upload`)
    - Dosya validasyonu ve hash kontrolü
    - Supabase Storage entegrasyonu
+   - Application CRUD API'leri (`/api/applications/*`)
+   - Application notes, timeline, stats API'leri
 
 6. **Takım Koordinasyonu**
    - TEAM_COORDINATION.md - İş bölümü belgesi
@@ -52,7 +54,21 @@
    - Job matching API (`/api/ai/job-match`)
    - Immigration roadmap API (`/api/ai/immigration-roadmap`)
 
-8. **Deployment Hazırlığı**
+8. **Payment Integration**
+   - Stripe servis modülü (`/lib/payments/stripe.ts`)
+   - PayPal servis modülü (`/lib/payments/paypal.ts`)
+   - Unified payment provider (`/lib/payments/provider.ts`)
+   - Payment create, confirm, refund API'leri
+   - Webhook handlers (Stripe & PayPal)
+
+9. **Email Service**
+   - SendGrid entegrasyonu (`/lib/email/sendgrid.ts`)
+   - Email templates (`/lib/email/templates.ts`)
+   - Email send API (`/api/email/send`)
+   - Dynamic template support
+   - Email logging system
+
+10. **Deployment Hazırlığı**
    - npm install başarılı
    - Development server çalışıyor
    - Environment variables hazır
@@ -67,8 +83,9 @@
 
 **Claude:**
 - [x] AI servis entegrasyonları
-- [ ] Application CRUD API'leri
-- [ ] Payment integration
+- [x] Application CRUD API'leri
+- [x] Payment integration
+- [x] Email service integration
 
 ### 📋 Bekleyen İşler
 
@@ -79,16 +96,19 @@
    - Job cards
 
 2. **Backend Services**
-   - Email servisi (SendGrid)
-   - AI analiz servisleri
-   - Job scraping servisi
-   - Notification sistemi
+   - [x] Email servisi (SendGrid)
+   - [x] AI analiz servisleri
+   - [ ] Job scraping servisi
+   - [ ] Notification sistemi
+   - [ ] Appointment scheduling API
+   - [ ] Document OCR service
 
 3. **Integrations**
-   - Stripe payment
-   - DocuSign e-imza
-   - Calendar sync (Google/Outlook)
-   - Job portal API'leri
+   - [x] Stripe payment
+   - [x] PayPal payment
+   - [ ] DocuSign e-imza
+   - [ ] Calendar sync (Google/Outlook)
+   - [ ] Job portal API'leri (Indeed, StepStone, LinkedIn)
 
 4. **DevOps**
    - Docker configuration
@@ -103,11 +123,19 @@ visa-assist-project/
 ├── app/
 │   ├── (auth)/          ✅ Login/Register sayfaları
 │   ├── (dashboard)/     ✅ Dashboard layout ve ana sayfa
-│   ├── api/            ✅ Document upload API
+│   ├── api/            
+│   │   ├── documents/   ✅ Document upload API
+│   │   ├── applications/ ✅ Application CRUD, notes, timeline, stats
+│   │   ├── ai/         ✅ AI analysis endpoints
+│   │   ├── payments/   ✅ Payment processing endpoints
+│   │   └── email/      ✅ Email service endpoint
 │   └── page.tsx        ✅ Landing page
 ├── components/         🚧 VS Developer çalışıyor
 ├── lib/
 │   ├── supabase/       ✅ Client/Server setup
+│   ├── ai/            ✅ OpenAI, Claude, unified provider
+│   ├── payments/       ✅ Stripe, PayPal, unified provider
+│   ├── email/         ✅ SendGrid, templates
 │   └── utils/          ✅ cn utility
 ├── types/              ✅ TypeScript tanımlamaları
 ├── supabase/           ✅ Migration dosyaları
@@ -118,7 +146,7 @@ visa-assist-project/
 
 - **Branch**: main
 - **Remote**: https://github.com/lekesiz/visa-assist-project.git
-- **Son Commit**: AI API endpoints added (59bd931)
+- **Son Commit**: Payment and email services added (988c67d)
 
 ## 🎯 Sonraki Adımlar
 
