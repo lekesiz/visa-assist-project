@@ -15,7 +15,6 @@ const nextConfig = {
 
   // Experimental features
   experimental: {
-    serverActions: true,
     serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
 
