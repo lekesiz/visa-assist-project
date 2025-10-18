@@ -6,7 +6,7 @@
 
 ## 🏗️ Mevcut Durum
 
-**Son Güncelleme**: 18 Ocak 2025 - 11:45
+**Son Güncelleme**: 18 Ocak 2025 - 12:15
 
 ### ✅ Tamamlanan İşler
 
@@ -48,6 +48,9 @@
    - AI Provider yönetimi (`/lib/ai/provider.ts`)
    - Document analysis API (`/api/ai/analyze-document`)
    - Visa recommendation API (`/api/ai/recommend-visa`)
+   - Denklik analysis API (`/api/ai/denklik-analysis`)
+   - Job matching API (`/api/ai/job-match`)
+   - Immigration roadmap API (`/api/ai/immigration-roadmap`)
 
 8. **Deployment Hazırlığı**
    - npm install başarılı
@@ -63,7 +66,7 @@
 - [ ] Responsive sidebar component
 
 **Claude:**
-- [ ] AI servis entegrasyonları
+- [x] AI servis entegrasyonları
 - [ ] Application CRUD API'leri
 - [ ] Payment integration
 
@@ -115,21 +118,22 @@ visa-assist-project/
 
 - **Branch**: main
 - **Remote**: https://github.com/lekesiz/visa-assist-project.git
-- **Son Commit**: Initial setup (beklemede)
+- **Son Commit**: AI API endpoints added (59bd931)
 
 ## 🎯 Sonraki Adımlar
 
 1. **Immediate (Bugün)**
-   - [ ] npm install ve dependency kurulumu
-   - [ ] .env.local dosyası oluşturma
-   - [ ] İlk commit ve push
+   - [x] npm install ve dependency kurulumu
+   - [x] .env.local dosyası oluşturma
+   - [x] İlk commit ve push
    - [ ] Supabase proje kurulumu
 
 2. **Short-term (Bu Hafta)**
    - [ ] FileUploader component tamamlama
    - [ ] Belge listeleme sayfası
-   - [ ] AI analiz endpoint'i
+   - [x] AI analiz endpoint'leri
    - [ ] Basic UI component library
+   - [ ] Application CRUD API'leri
 
 3. **Mid-term (2 Hafta)**
    - [ ] Denklik süreci modülü
