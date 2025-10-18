@@ -1,168 +1,177 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { withErrorHandler, getUserFromHeaders, NotFoundError, ConflictError } from '@/lib/error-handler'
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+import { validateRequestBody, validateQueryParams, paginationSchema, dateSchema } from '@/lib/validations/common'
+
+// Validation schemas
+const listApplicationsQuerySchema = paginationSchema.extend({
+  status: z.enum(['draft', 'in_progress', 'submitted', 'approved', 'rejected']).optional(),
+  visa_type: z.enum(['tourist', 'business', 'student', 'work', 'family_reunion']).optional(),
+})
+
+const createApplicationSchema = z.object({
+  visa_type: z.enum(['tourist', 'business', 'student', 'work', 'family_reunion']),
+  target_country: z.string().length(2).default('DE'),
+  purpose_of_travel: z.string().min(10).max(500),
+  planned_travel_date: dateSchema.optional(),
+  duration_of_stay: z.number().min(1).max(365).optional(),
+  notes: z.string().max(1000).optional(),
+})
 
 // GET - List all applications for the authenticated user
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  // Rate limiting
+  const rateLimitResult = await checkRateLimit(request, RATE_LIMITS.read)
+  if (!rateLimitResult.success) return rateLimitResult.error
+
+  // Get user from middleware
+  const user = getUserFromHeaders(request.headers)
+  
+  const supabase = await createClient()
+
+  // Validate query parameters
+  const searchParams = new URL(request.url).searchParams
+  const params = validateQueryParams(searchParams, listApplicationsQuerySchema)
+
+  // Build query
+  let query = supabase
+    .from('applications')
+    .select(`
+      *,
+      documents:documents(count),
+      appointments:appointments(
+        id,
+        appointment_date,
+        appointment_type,
+        status
+      ),
+      ai_analyses:ai_analyses(
+        analysis_type,
+        confidence_score,
+        created_at
+      )
+    `, { count: 'exact' })
+    .eq('user_id', user.id)
+
+  // Apply filters
+  if (params.status) {
+    query = query.eq('status', params.status)
+  }
+  if (params.visa_type) {
+    query = query.eq('visa_type', params.visa_type)
+  }
+
+  // Apply sorting
+  if (params.sortBy) {
+    query = query.order(params.sortBy, { ascending: params.sortOrder === 'asc' })
+  } else {
+    query = query.order('created_at', { ascending: false })
+  }
+
+  // Apply pagination
+  const offset = (params.page - 1) * params.limit
+  const { data, error, count } = await query
+    .range(offset, offset + params.limit - 1)
+
+  if (error) {
+    console.error('Database error fetching applications:', error)
+    throw error
+  }
+
+  return NextResponse.json({
+    success: true,
+    data: data || [],
+    pagination: {
+      page: params.page,
+      limit: params.limit,
+      total: count || 0,
+      totalPages: Math.ceil((count || 0) / params.limit),
+      hasMore: (count || 0) > offset + params.limit
     }
+  })
+})
 
-    // Get query parameters
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    const visaType = searchParams.get('visa_type')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const offset = parseInt(searchParams.get('offset') || '0')
+// POST - Create a new application
+export const POST = withErrorHandler(async (request: NextRequest) => {
+  // Rate limiting
+  const rateLimitResult = await checkRateLimit(request, RATE_LIMITS.api)
+  if (!rateLimitResult.success) return rateLimitResult.error
 
-    // Build query
-    let query = supabase
-      .from('applications')
-      .select(`
-        *,
-        documents:documents(count),
-        appointments:appointments(
-          id,
-          appointment_date,
-          appointment_type,
-          status
-        ),
-        ai_analyses:ai_analyses(
-          analysis_type,
-          confidence_score,
-          created_at
-        )
-      `, { count: 'exact' })
-      .eq('user_id', user.id)
+  // Get user from middleware
+  const user = getUserFromHeaders(request.headers)
+  
+  const supabase = await createClient()
 
-    // Apply filters
-    if (status) {
-      query = query.eq('status', status)
-    }
-    if (visaType) {
-      query = query.eq('visa_type', visaType)
-    }
+  // Validate request body
+  const body = await validateRequestBody(request, createApplicationSchema)
 
-    // Apply pagination and ordering
-    const { data, error, count } = await query
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+  // Check if user has an active application
+  const { data: activeApp } = await supabase
+    .from('applications')
+    .select('id, status, visa_type')
+    .eq('user_id', user.id)
+    .in('status', ['draft', 'in_progress', 'submitted'])
+    .single()
 
-    if (error) {
-      throw error
-    }
+  if (activeApp) {
+    throw new ConflictError(
+      'You already have an active application',
+      {
+        existingApplicationId: activeApp.id,
+        status: activeApp.status,
+        visaType: activeApp.visa_type
+      }
+    )
+  }
 
-    return NextResponse.json({
-      success: true,
-      applications: data || [],
-      pagination: {
-        total: count || 0,
-        limit,
-        offset,
-        hasMore: (count || 0) > offset + limit
+  // Create new application
+  const { data: application, error: createError } = await supabase
+    .from('applications')
+    .insert({
+      user_id: user.id,
+      visa_type: body.visa_type,
+      target_country: body.target_country,
+      purpose_of_travel: body.purpose_of_travel,
+      planned_travel_date: body.planned_travel_date,
+      duration_of_stay: body.duration_of_stay,
+      notes: body.notes,
+      status: 'draft',
+      current_step: 1,
+      total_steps: 8,
+      progress_percentage: 0,
+      checklist_items: getDefaultChecklist(body.visa_type),
+      is_premium: false
+    })
+    .select()
+    .single()
+
+  if (createError) {
+    console.error('Database error creating application:', createError)
+    throw createError
+  }
+
+  // Create initial activity log
+  await supabase
+    .from('activity_logs')
+    .insert({
+      user_id: user.id,
+      entity_type: 'application',
+      entity_id: application.id,
+      action: 'created',
+      details: {
+        visa_type: body.visa_type,
+        purpose_of_travel: body.purpose_of_travel
       }
     })
 
-  } catch (error) {
-    console.error('Failed to fetch applications:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch applications' },
-      { status: 500 }
-    )
-  }
-}
-
-// POST - Create a new application
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Get request body
-    const body = await request.json()
-    const { visa_type, target_country = 'DE', purpose_of_travel, planned_travel_date } = body
-
-    // Validate required fields
-    if (!visa_type || !purpose_of_travel) {
-      return NextResponse.json(
-        { error: 'Visa type and purpose of travel are required' },
-        { status: 400 }
-      )
-    }
-
-    // Check if user has an active application
-    const { data: activeApp } = await supabase
-      .from('applications')
-      .select('id')
-      .eq('user_id', user.id)
-      .in('status', ['draft', 'in_progress', 'submitted'])
-      .single()
-
-    if (activeApp) {
-      return NextResponse.json(
-        { error: 'You already have an active application. Please complete or cancel it first.' },
-        { status: 400 }
-      )
-    }
-
-    // Create new application
-    const { data: application, error: createError } = await supabase
-      .from('applications')
-      .insert({
-        user_id: user.id,
-        visa_type,
-        target_country,
-        purpose_of_travel,
-        planned_travel_date,
-        status: 'draft',
-        current_step: 1,
-        total_steps: 8,
-        progress_percentage: 0,
-        checklist_items: getDefaultChecklist(visa_type),
-        is_premium: false
-      })
-      .select()
-      .single()
-
-    if (createError) {
-      throw createError
-    }
-
-    // Create initial activity log
-    await supabase
-      .from('activity_logs')
-      .insert({
-        user_id: user.id,
-        entity_type: 'application',
-        entity_id: application.id,
-        action: 'created',
-        details: {
-          visa_type,
-          purpose_of_travel
-        }
-      })
-
-    return NextResponse.json({
-      success: true,
-      application,
-      message: 'Application created successfully'
-    })
-
-  } catch (error) {
-    console.error('Failed to create application:', error)
-    return NextResponse.json(
-      { error: 'Failed to create application' },
-      { status: 500 }
-    )
-  }
-}
+  return NextResponse.json({
+    success: true,
+    data: application,
+    message: 'Application created successfully'
+  }, { status: 201 })
+})
 
 // Helper function to get default checklist based on visa type
 function getDefaultChecklist(visaType: string) {
@@ -175,7 +184,7 @@ function getDefaultChecklist(visaType: string) {
     { id: 'financial_proof', label: 'Financial Proof', completed: false, required: true }
   ]
 
-  const visaSpecificItems = {
+  const visaSpecificItems: Record<string, any[]> = {
     tourist: [
       { id: 'return_ticket', label: 'Return Flight Ticket', completed: false, required: true },
       { id: 'itinerary', label: 'Travel Itinerary', completed: false, required: true }
@@ -203,6 +212,6 @@ function getDefaultChecklist(visaType: string) {
 
   return [
     ...commonItems,
-    ...(visaSpecificItems[visaType as keyof typeof visaSpecificItems] || [])
+    ...(visaSpecificItems[visaType] || [])
   ]
 }
