@@ -268,11 +268,6 @@
 
   "regions": ["fra1", "iad1"],
 
-  "env": {
-    "NEXT_PUBLIC_VERCEL_ENV": "@vercel-env",
-    "VERCEL_URL": "@vercel-url"
-  },
-
   "github": {
     "enabled": false
   },
