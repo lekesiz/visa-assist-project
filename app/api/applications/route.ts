@@ -147,8 +147,14 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     .single()
 
   if (createError) {
-    console.error('Database error creating application:', createError)
-    throw createError
+    console.error('Database error creating application:', {
+      error: createError,
+      message: createError.message,
+      details: createError.details,
+      hint: createError.hint,
+      code: createError.code
+    })
+    throw new Error(`Database error: ${createError.message || 'Failed to create application'}`)
   }
 
   // Create initial activity log
