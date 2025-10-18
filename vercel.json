@@ -29,7 +29,7 @@
 
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/:path*",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "headers": [
         {
           "key": "X-Content-Type-Options",
@@ -96,7 +96,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(css|js|woff|woff2|ttf|eot|svg|png|jpg|jpeg|gif|ico|webp|avif))",
+      "source": "/:path*.(css|js|woff|woff2|ttf|eot|svg|png|jpg|jpeg|gif|ico|webp|avif)",
       "headers": [
         {
           "key": "Cache-Control",
