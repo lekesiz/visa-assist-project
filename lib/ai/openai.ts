@@ -113,11 +113,11 @@ export async function getVisaRecommendations(
  */
 export async function generateCV(
   userData: {
-    personalInfo: any
-    education: any[]
-    experience: any[]
+    personalInfo: Record<string, any>
+    education: Record<string, any>[]
+    experience: Record<string, any>[]
     skills: string[]
-    languages: any[]
+    languages: Record<string, any>[]
   },
   targetJob?: string
 ): Promise<string> {

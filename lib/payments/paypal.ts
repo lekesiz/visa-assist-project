@@ -97,7 +97,7 @@ export async function createOrder({
       }
     )
 
-    const approveLink = response.data.links.find((link: any) => link.rel === 'approve')
+    const approveLink = response.data.links.find((link: Record<string, any>) => link.rel === 'approve')
 
     return {
       orderId: response.data.id,
@@ -183,7 +183,7 @@ export async function refundPayment(captureId: string, amount?: string, currency
   try {
     const accessToken = await getAccessToken()
 
-    const body: any = {}
+    const body: Record<string, any> = {}
     if (amount && currency) {
       body.amount = {
         value: amount,
@@ -221,7 +221,7 @@ export async function refundPayment(captureId: string, amount?: string, currency
 export async function verifyWebhookSignature(
   webhookId: string,
   headers: Record<string, string>,
-  body: any
+  body: Record<string, any>
 ): Promise<boolean> {
   try {
     const accessToken = await getAccessToken()
@@ -257,7 +257,7 @@ export async function verifyWebhookSignature(
 /**
  * Handle webhook events
  */
-export async function handleWebhookEvent(event: any) {
+export async function handleWebhookEvent(event: Record<string, any>) {
   switch (event.event_type) {
     case 'PAYMENT.CAPTURE.COMPLETED':
       return {
