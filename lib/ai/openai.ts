@@ -1,9 +1,18 @@
 import OpenAI from 'openai'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy initialize OpenAI client to avoid errors during build
+let openai: OpenAI | null = null
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is not set')
+    }
+    openai = new OpenAI({ apiKey })
+  }
+  return openai
+}
 
 // Document analysis types
 interface DocumentAnalysisResult {
@@ -33,7 +42,7 @@ export async function analyzeDocument(
   documentType: string
 ): Promise<DocumentAnalysisResult> {
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages: [
         {
@@ -82,7 +91,7 @@ export async function getVisaRecommendations(
   }
 ): Promise<VisaRecommendation[]> {
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages: [
         {
@@ -122,7 +131,7 @@ export async function generateCV(
   targetJob?: string
 ): Promise<string> {
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages: [
         {
@@ -173,7 +182,7 @@ export async function chatWithAssistant(
       }
     ]
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages,
       temperature: 0.7,

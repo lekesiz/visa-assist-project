@@ -261,6 +261,22 @@ function mapPayPalStatus(paypalStatus: string): PaymentStatus {
   return statusMap[paypalStatus] || 'pending'
 }
 
-// Export service types
-export * from './stripe'
-export * from './paypal'
+// Export service types - use named imports to avoid conflicts
+export {
+  stripe,
+  createPaymentIntent,
+  confirmPaymentIntent,
+  refundPayment as stripeRefundPayment,
+  constructWebhookEvent,
+  handleWebhookEvent as handleStripeWebhookEvent,
+  type StripePaymentIntent,
+  type StripeRefund,
+} from './stripe'
+
+export {
+  createOrder,
+  captureOrder,
+  refundPayment as paypalRefundPayment,
+  verifyWebhookSignature,
+  handleWebhookEvent as handlePaypalWebhookEvent,
+} from './paypal'

@@ -1,9 +1,18 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+// Lazy initialize Anthropic client to avoid errors during build
+let anthropic: Anthropic | null = null
+
+function getAnthropicClient(): Anthropic {
+  if (!anthropic) {
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+    }
+    anthropic = new Anthropic({ apiKey })
+  }
+  return anthropic
+}
 
 interface DenklikAnalysis {
   professionMatch: number // 0-100
@@ -36,7 +45,7 @@ export async function analyzeDenklik(
   targetState: string
 ): Promise<DenklikAnalysis> {
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropicClient().messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 1000,
       temperature: 0.3,
@@ -96,7 +105,7 @@ export async function matchJobOpportunities(
   }
 ): Promise<JobMatchResult> {
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropicClient().messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 1000,
       temperature: 0.5,
@@ -171,7 +180,7 @@ export async function generateImmigrationRoadmap(
   alternativeRoutes: string[]
 }> {
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropicClient().messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 2000,
       temperature: 0.6,
@@ -227,7 +236,7 @@ export async function reviewApplicationDocuments(
   rewrittenSections?: Record<string, string>
 }> {
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropicClient().messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 1500,
       temperature: 0.4,
